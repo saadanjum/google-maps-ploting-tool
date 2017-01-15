@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Drawing tools</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #tool-area{
+        float:right;
+        width: 49%;
+        height: 96%; 
+        border: solid; 
+        margin-top: 10px;
+        padding-top: 10px
+      }
+      #map {
+        width: 50%;
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <div id="tool-area">
+      <strong>Markers</strong>
+      <textarea id="latlontxt" style="width: 180px; height: 50px" placeholder="input comma separated lat lng here."></textarea>
+      <button id="btn_plot" onclick="plotlatlon()">Plot</button> </br> </br>
+      <strong>Center Map</strong>
+      <input type="text" name="center" id='center_input' placeholder="latitude, longitude">
+      <button id="center_btn" onclick="centerMap()">Center</button> </br> </br>
+      <strong>Polygon Array</strong>
+      <textarea id="polygon_text" style="width: 180px; height: 50px" placeholder="Polygon coordinates will appear here"></textarea>
+    </div>
+    <div id="map"></div>
+    <script>
+
+      var map = null;
+      var markers = [];
+      var coordinates = [];
+      // This example requires the Drawing library. Include the libraries=drawing
+      // parameter when you first load the API. For example:
+      // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=drawing">
+
+      function parseCenterLatLng(latlng){
+        var latlonArray = latlng.trim().replace(" ", "").split(',');
+        return {lat: Number(latlonArray[0]), lng: Number(latlonArray[1])};
+      }
+
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: -34.397, lng: 150.644},
+          zoom: 8
+        });
+
+        var drawingManager = new google.maps.drawing.DrawingManager({
+          drawingMode: google.maps.drawing.OverlayType.POLYGON,
+          drawingControl: true,
+          drawingControlOptions: {
+            position: google.maps.ControlPosition.TOP_CENTER,
+            drawingModes: ['polygon']
+          },
+          markerOptions: {icon: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png'},
+          circleOptions: {
+            fillColor: '#ffff00',
+            fillOpacity: 1,
+            strokeWeight: 5,
+            clickable: false,
+            editable: true,
+            zIndex: 1
+          }
+        });
+        drawingManager.setMap(map);
+
+        google.maps.event.addListener(drawingManager, 'overlaycomplete', function(polygon) {
+            coordinates.push(polygon.overlay.getPath().getArray());
+            $('#polygon_text').val(parsePolygonCoordinates())
+        });
+
+      }
+
+      function parsePolygonCoordinates(){
+          var coor = []
+          var coordinateText = []
+          coordinates.forEach(function(polygon){
+            poly = []
+            polygon.forEach(function(point){
+              lat = point.lat();
+              lng = point.lng();
+              poin = []
+              poin.push(lat);
+              poin.push(lng);
+              poly.push(poin)
+            });
+            coor.push(poly)
+          });
+          coordinateText = JSON.stringify(coor,null, 2);
+          return coordinateText;
+      }
+
+      function centerMap(){
+        center = $('#center_input').val()
+        map.setCenter(parseCenterLatLng(center));
+      }
+
+      function plotlatlon(){
+          var text = $('#latlontxt').val();
+          var latlongs = text.split("\n");
+          latlongs.forEach(function(latlon){
+              var latlonArr = latlon.split(",");
+              var myLatLng = {lat: Number(latlonArr[0]), lng: Number(latlonArr[1])};
+              var marker = new google.maps.Marker({
+                  position: myLatLng,
+                  map: map,
+                  title: latlon
+              });
+              map.setCenter(myLatLng);
+              map.setZoom(20);
+              markers.push(marker);
+          });
+      }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCDh1kTnD91Iki6TDKEbB6fxYN-lhyigXE&libraries=drawing&callback=initMap"
+         async defer></script>
+  </body>
+</html>
