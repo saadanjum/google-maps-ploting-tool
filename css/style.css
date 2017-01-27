@@ -1,0 +1,23 @@
+#tool-area{
+  width: 40%;
+  height: 96%;
+  margin-top: 10px;
+  margin-right: 10px;
+  padding-top: 10px
+}
+#map {
+  width: 59%;
+  height: 100%;
+}
+/* Optional: Makes the sample page fill the window. */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.panel textarea{
+  width: 270px; 
+  height: 50px;
+  resize:vertical;
+}
