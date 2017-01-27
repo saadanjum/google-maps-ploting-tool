@@ -61,7 +61,6 @@ var map = null;
             position: google.maps.ControlPosition.TOP_CENTER,
             drawingModes: ['polygon', 'marker']
           },
-          markerOptions: {icon: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png'},
           circleOptions: {
             fillColor: '#ffff00',
             fillOpacity: 1,
@@ -76,18 +75,28 @@ var map = null;
         google.maps.event.addListener(drawingManager, 'overlaycomplete', function(geom) {
           geoms.push(geom);
           if (geom.type == 'polygon'){
-            polygons.push(geom);
-            coordinates.push(geom.overlay.getPath().getArray());
-            $('#polygon_text').val(parsePolygonCoordinates());
+            polygons.push(geom.overlay);
+            // coordinates.push(geom.overlay.getPath().getArray());
+            var wkt = new Wkt.Wkt()
+            wkt.fromObject(geom.overlay);
+            var j = wkt.toJson();
+            $('#array_detail_text').val(JSON.stringify(inverseLatLngFormat(j.coordinates), null, 2));
+            $('#wkt_detail_text').val(wkt.write())
+            var center = getCenter(geom.overlay);
+            $('#centeroid_detail').val(center.lat() + ', ' + center.lng());
           }
           else if (geom.type == 'marker'){
             var lat = geom.overlay.position.lat();
             var lng = geom.overlay.position.lng();
-            if ($('#latlontxt').val("")){
+            var wkt = new Wkt.Wkt()
+            wkt.fromObject(geom.overlay);
+            $('#centeroid_detail').val(lat + ', ' + lng);
+            $('#wkt_detail_text').val(wkt.write());
+            if ($('#latlontxt').val() == ""){
               $('#latlontxt').val(lat+", "+lng);
             } 
             else{
-              $('#latlontxt').val("\n"+lat+", "+lng);
+              $('#latlontxt').val($('#latlontxt').val() + "\n"+lat+", "+lng);
             }
           }
         });
@@ -132,6 +141,17 @@ var map = null;
 
       }
 
+      function inverseLatLngFormat(coordinates){
+        coordinates.forEach(function(polygon){
+            polygon.forEach(function(point){
+              var t = point[0]
+              point[0] = point[1]
+              point[1] = t
+            });
+          });
+        return coordinates;
+      }
+
       function parsePolygonCoordinates(){
           var coor = []
           var coordinateText = []
@@ -154,6 +174,16 @@ var map = null;
       function centerMap(){
         center = $('#center_input').val()
         map.setCenter(parseCenterLatLng(center));
+      }
+
+
+      function getCenter(polygon){
+        var path = polygon.getPath().getArray()
+        var bounds = new google.maps.LatLngBounds();
+        path.forEach(function(point){
+          bounds.extend(point);
+        });
+        return bounds.getCenter();
       }
 
       function plotlatlon(){

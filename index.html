@@ -4,8 +4,7 @@
     <title>Drawing tools</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCDh1kTnD91Iki6TDKEbB6fxYN-lhyigXE&libraries=drawing&callback=initMap"
-         async defer></script>
+    
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script type="text/javascript" src="js/wicket.min.js"></script>
     <script src="js/wicket-gmap3.js" type="text/javascript"></script>
@@ -13,6 +12,8 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="css/style.css">
     <script src="js/maptool.js" type="text/javascript"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCDh1kTnD91Iki6TDKEbB6fxYN-lhyigXE&libraries=drawing&callback=initMap"
+         async defer></script>
   </head>
   <body>
 
@@ -20,7 +21,7 @@
     <div id="tool-area" class="panel panel-default pull-right">
     <div class="panel-body">
       <h3>Draw</h3>
-      <table class="table">
+      <table class="table" id="input_fields">
         <tr>
           <td>Markers</td>
           <td><textarea id="latlontxt" class="form-control" placeholder="input comma separated lat lng here."></textarea></td>
@@ -37,13 +38,39 @@
           <td><button id="poly_arr_btn" class="btn btn-primary col-md-12" onclick="createPolygon()">Draw</button></td>
         </tr>
         <tr>
-          <td>Draw WKT Multipolygon <input id="color_txt" class="form-control" placeholder="Color HEX value"></input></td>
-          <td><textarea id="wkt_polygon_text" class="form-control" placeholder="INPUT WKT TEXT"></textarea></td>
+          <td>Draw WKT Multipolygon</td>
+          <td><textarea id="wkt_polygon_text" class="form-control" placeholder="Input WKT string"></textarea></td>
           <td><button id="wkt_poly_btn" class="btn btn-primary col-md-12" onclick="drawPolygonFromWKT()">Draw</button> </br> </br></td>
         </tr>
       </table>
-
-      <h3>Details</h3>
+      <div id="details_panel" class="panel panel-default">
+        <div class="panel-body">
+          <h3>Details</h3>
+          <table class="table">
+            <tr>
+              <td>
+                <h5>Centroid (lat,lng)</h5>
+                <input type="text" class="form-control" id="centeroid_detail" placeholder="Latitude, Longtidude" disabled="">
+              </td>
+              <td>
+                <h5>Color</h5>
+                <select id="color_select" class="form-control">
+                  <option value="red">Red</option>
+                  <option value="green">Green</option>
+                  <option value="Yellow">Yellow</option>
+                  <option value="purple">Purple</option>
+                </select>
+              </td>
+            </tr>
+          </table>
+          <div class="border-pad">
+            <h5>Json Array</h5>
+            <textarea class="form-control" id="array_detail_text" disabled=""></textarea>
+            <h5>WKT Format</h5>
+            <textarea class="form-control" id="wkt_detail_text" disabled=""></textarea>
+          </div>
+        </div>
+      </div>
     </div>
     </div>
 
