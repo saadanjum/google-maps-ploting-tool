@@ -8,15 +8,14 @@
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
       #tool-area{
-        float:right;
-        width: 49%;
-        height: 96%; 
-        border: solid; 
+        width: 40%;
+        height: 96%;
         margin-top: 10px;
+        margin-right: 10px;
         padding-top: 10px
       }
       #map {
-        width: 50%;
+        width: 59%;
         height: 100%;
       }
       /* Optional: Makes the sample page fill the window. */
@@ -25,28 +24,56 @@
         margin: 0;
         padding: 0;
       }
+
+      .panel textarea{
+        width: 270px; 
+        height: 50px;
+        resize:vertical;
+      }
     </style>
-  </head>
-  <body>
+
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script type="text/javascript" src="wicket.min.js"></script>
     <script src="wicket-gmap3.js" type="text/javascript"></script>
-    <div id="tool-area">
-      <strong>Markers</strong>
-      <textarea id="latlontxt" style="width: 180px; height: 50px" placeholder="input comma separated lat lng here."></textarea>
-      <button id="btn_plot" onclick="plotlatlon()">Plot</button> </br> </br>
-      <strong>Center Map</strong>
-      <input type="text" name="center" id='center_input' placeholder="latitude, longitude">
-      <button id="center_btn" onclick="centerMap()">Center</button> </br> </br>
-      <strong>Polygon Array</strong>
-      <textarea id="polygon_text" style="width: 180px; height: 50px" placeholder="Polygon coordinates will appear here"></textarea>
-      <button id="center_btn" onclick="createPolygon()">Draw</button> </br> </br>
-      <strong>Draw WKT Multipolygon</strong>
-      <textarea id="wkt_polygon_text" style="width: 180px; height: 50px" placeholder="INPUT WKT TEXT"></textarea>
-      <input id="color_txt" placeholder="Color HEX value"></input>
-      <button id="center_btn" onclick="drawPolygonFromWKT()">Draw</button> </br> </br>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  </head>
+  <body>
+
+
+    <div id="tool-area" class="panel panel-default pull-right">
+    <div class="panel-body">
+      <h3>Draw</h3>
+      <table class="table">
+        <tr>
+          <td>Markers</td>
+          <td><textarea id="latlontxt" class="form-control" placeholder="input comma separated lat lng here."></textarea></td>
+          <td><button id="btn_plot" class="btn btn-primary col-md-12" onclick="plotlatlon()">Plot</button></td>
+        </tr>
+        <tr>
+          <td>Center Map</td>
+          <td><input type="text" class="form-control" name="center" id='center_input' placeholder="latitude, longitude"></td>
+          <td><button id="center_btn" class="btn btn-primary col-md-12" onclick="centerMap()">Center</button></td>
+        </tr>
+        <tr>
+          <td>Polygon Array</td>
+          <td><textarea id="polygon_text" class="form-control" placeholder="Polygon coordinates will appear here"></textarea></td>
+          <td><button id="poly_arr_btn" class="btn btn-primary col-md-12" onclick="createPolygon()">Draw</button></td>
+        </tr>
+        <tr>
+          <td>Draw WKT Multipolygon <input id="color_txt" class="form-control" placeholder="Color HEX value"></input></td>
+          <td><textarea id="wkt_polygon_text" class="form-control" placeholder="INPUT WKT TEXT"></textarea></td>
+          <td><button id="wkt_poly_btn" class="btn btn-primary col-md-12" onclick="drawPolygonFromWKT()">Draw</button> </br> </br></td>
+        </tr>
+      </table>
+
+      <h3>Details</h3>
     </div>
+    </div>
+
     <div id="map"></div>
+
     <script>
 
       var map = null;
