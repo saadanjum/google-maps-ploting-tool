@@ -5,9 +5,23 @@ var map = null;
       var bounds = null;
       var features = [];
       var geoms = [];
+      var polyIndex = 0;
+      var selectedPolygon = null;
+      var polygonDefaultSettings = {fillColor: 'red', colorHistory: 'red', strokeWeight: 1.0};
+      var onSelectColor = 'orange';
       // This example requires the Drawing library. Include the libraries=drawing
       // parameter when you first load the API. For example:
       // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=drawing">
+
+      function polygonIndexGenerator(){
+          polyIndex += 1;
+          return polyIndex;
+      }
+
+      function colorSelectionOnChange(){
+        var color = $('#color_select').val();
+        selectedPolygon.setOptions({fillColor: color, colorHistory: color});
+      }
 
       function createPolygon(){
         var t = $('#polygon_text').val();
@@ -19,7 +33,25 @@ var map = null;
         return {lat: Number(latlonArray[0]), lng: Number(latlonArray[1])};
       }
 
-      function DrawPolygons(PolyArray, source){
+      var addClickListenersOnPolygon = function(polygon) {
+        google.maps.event.addListener(polygon, 'click', function (event) {
+          selectedPolygon = polygon;
+          polygons.forEach(function(p){
+            p.setOptions({fillColor: p.colorHistory, strokeWeight: polygonDefaultSettings.strokeWeight});
+          });
+          polygon.setOptions({fillColor: onSelectColor, strokeWeight: 2.5});
+          var wkt = new Wkt.Wkt()
+          wkt.fromObject(polygon);
+          var j = wkt.toJson();
+          $('#array_detail_text').val(JSON.stringify(inverseLatLngFormat(j.coordinates), null, 2));
+          $('#wkt_detail_text').val(wkt.write())
+          var center = getCenter(polygon);
+          $('#centeroid_detail').val(center.lat() + ', ' + center.lng());
+          $('#color_select').val(polygon.colorHistory);
+        });  
+      }
+
+      function DrawPolygons(PolyArray){
         
         PolyArray.forEach(function(_poly){
           polyCoords = []
@@ -29,20 +61,15 @@ var map = null;
             bounds.extend(new google.maps.LatLng(_latlng[0], _latlng[1]))
           });
 
-          var poly = new google.maps.Polygon({
-            paths: polyCoords,
-            strokeColor: '#FF0000',
-            strokeOpacity: 0.8,
-            strokeWeight: 2,
-            fillColor: '#FF0000',
-            fillOpacity: 0.35
-          });
+          var poly = new google.maps.Polygon(polygonDefaultSettings);
+          poly.setOptions({indexID: polygonIndexGenerator()});
+          addClickListenersOnPolygon(poly);
           map.fitBounds(bounds);
           poly.setMap(map);
           polygons.push(poly);
           centerLat = (polyCoords[0][0]+polyCoords[Math.ceil(polyCoords.length/2)][1])/2;
           centerLon = (polyCoords[0][1]+ polyCoords[Math.ceil(polyCoords.length/2)][0])/2;
-          map.setCenter({lat: polyCoords[0][0], lng: polyCoords[0][1]});
+          // map.setCenter({lat: polyCoords[0][0], lng: polyCoords[0][1]});
         });
 
       }
@@ -61,14 +88,7 @@ var map = null;
             position: google.maps.ControlPosition.TOP_CENTER,
             drawingModes: ['polygon', 'marker']
           },
-          circleOptions: {
-            fillColor: '#ffff00',
-            fillOpacity: 1,
-            strokeWeight: 5,
-            clickable: false,
-            editable: true,
-            zIndex: 1
-          }
+          polygonOptions: polygonDefaultSettings
         });
         drawingManager.setMap(map);
 
@@ -76,6 +96,9 @@ var map = null;
           geoms.push(geom);
           if (geom.type == 'polygon'){
             polygons.push(geom.overlay);
+            geom.overlay.setOptions(polygonDefaultSettings)
+            geom.overlay.setOptions({indexID: polygonIndexGenerator()});
+            addClickListenersOnPolygon(geom.overlay);
             // coordinates.push(geom.overlay.getPath().getArray());
             var wkt = new Wkt.Wkt()
             wkt.fromObject(geom.overlay);
@@ -114,8 +137,11 @@ var map = null;
             for (i in obj) {
                 if (obj.hasOwnProperty(i) && !Wkt.isArray(obj[i])) {
                     obj[i].setMap(map);
-                    obj[i].setOptions({strokeWeight: 0.5, fillColor: $('#color_txt').val()});
-                    features.push(obj[i]);
+                    obj[i].setOptions(polygonDefaultSettings);
+                    obj[i].setOptions({indexID: polygonIndexGenerator()});
+                    addClickListenersOnPolygon(obj[i]);
+                    // features.push(obj[i]);
+                    polygons.push(obj[i]);
 
                     if(wkt.type === 'point' || wkt.type === 'multipoint')
                       bounds.extend(obj[i].getPosition());
@@ -124,11 +150,14 @@ var map = null;
                 }
             }
 
-            features = features.concat(obj);
+            polygons = polygons.concat(obj);
         } else {
             obj.setMap(map); // Add it to the map
-            obj.setOptions({strokeWeight: 0.5, fillColor: $('#color_txt').val()});
-            features.push(obj);
+            obj.setOptions(polygonDefaultSettings);
+            obj.setOptions({indexID: polygonIndexGenerator()});
+            addClickListenersOnPolygon(obj);
+            polygons.push(obj);
+            // features.push(obj);
 
             if(wkt.type === 'point' || wkt.type === 'multipoint')
               bounds.extend(obj.getPosition());

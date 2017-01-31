@@ -34,11 +34,11 @@
         </tr>
         <tr>
           <td>Polygon Array</td>
-          <td><textarea id="polygon_text" class="form-control" placeholder="Polygon coordinates will appear here"></textarea></td>
+          <td><textarea id="polygon_text" class="form-control" placeholder="Polygon coordinates"></textarea></td>
           <td><button id="poly_arr_btn" class="btn btn-primary col-md-12" onclick="createPolygon()">Draw</button></td>
         </tr>
         <tr>
-          <td>Draw WKT Multipolygon</td>
+          <td>WKT Polygon</td>
           <td><textarea id="wkt_polygon_text" class="form-control" placeholder="Input WKT string"></textarea></td>
           <td><button id="wkt_poly_btn" class="btn btn-primary col-md-12" onclick="drawPolygonFromWKT()">Draw</button> </br> </br></td>
         </tr>
@@ -54,7 +54,8 @@
               </td>
               <td>
                 <h5>Color</h5>
-                <select id="color_select" class="form-control">
+                <select id="color_select" class="form-control" onchange="colorSelectionOnChange()">
+                  <option value="none">None</option>
                   <option value="red">Red</option>
                   <option value="green">Green</option>
                   <option value="Yellow">Yellow</option>

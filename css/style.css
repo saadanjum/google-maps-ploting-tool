@@ -16,7 +16,6 @@ html, body {
 }
 
 #input_fields textarea{
-  width: 270px; 
   height: 50px;
   resize:vertical;
 }
